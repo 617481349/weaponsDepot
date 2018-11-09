@@ -6,10 +6,11 @@ export const resizeRem = () => {
     document.querySelector('html').style.fontSize = n + 'px';
 };
 
-export const getParams = (path) => {
-    const search = path.split('?');
+export const getParams = (path = window.location.href) => {
+    let search = path.split('?');
     const { length } = search;
-    const paramsList = search[length - 1].split('&');
+    search = search[length - 1].split('#')[0];
+    const paramsList = search.split('&');
     let params = {};
     paramsList.forEach((v) => {
         const item = v.split('=');
