@@ -273,7 +273,7 @@ module.exports = {
         // 禁止使用八进制的转义符
         'no-octal-escape': 'error',
         // 禁止对函数的参数重新赋值
-        'no-param-reassign': 'error',
+        'no-param-reassign': 0,
         // 禁止使用 __proto__
         'no-proto': 'error',
         // 禁止重复定义变量
@@ -401,7 +401,7 @@ module.exports = {
         // @fixable 禁止将 undefined 赋值给变量
         'no-undef-init': 'error',
         // 禁止对 undefined 重新赋值
-        'no-undefined': 'error',
+        'no-undefined': 'off',
         // 定义过的变量必须使用
         'no-unused-vars': [
             'error',
