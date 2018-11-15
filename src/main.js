@@ -3,9 +3,9 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import MessageBox from 'components/messagebox';
+import 'assets/css/index.scss';
 import { resizeRem } from 'util';
 resizeRem();
-console.log(MessageBox);
 Vue.prototype.$comfirm = MessageBox.confirm;
 Vue.config.productionTip = false;
 

@@ -74,7 +74,7 @@ module.exports = {
         // 禁止出现语法错误
         'vue/no-parsing-error': 'error',
         // 禁止覆盖保留字
-        'vue/no-reserved-keys': 'error',
+        'vue/no-reserved-keys': 'off',
         // @fixable 组件的 data 属性的值必须是一个函数
         'vue/no-shared-component-data': 'error',
         // 禁止在计算属性中对属性修改
@@ -163,7 +163,7 @@ module.exports = {
             'error', {
                 'singleline': 3,
                 'multiline': {
-                    'max': 1,
+                    'max': 4,
                     'allowFirstLine': true
                 }
             }
