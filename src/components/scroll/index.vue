@@ -3,7 +3,7 @@
          @scroll="handleScroll" @touchend="onEnd">
         <div class="scrollChild">
             <!-- 下拉刷新提示DOM -->
-            <div class="pulldownContent" :style="pullDownStyle">下拉刷新</div>
+            <div class="pulldownContent" :style="pullDownStyle">Refresh</div>
             <!-- 滚动组件内容插槽 -->
             <div ref="scrollContent">
                 <slot></slot>
@@ -39,10 +39,6 @@ export default {
             showPullUpContent: false,
             // 距离scroll顶部距离
             distanceToScrollTop: 0,
-            // 滚动条位置
-            scrollY: 0,
-            // 下拉拖动translateY最大值
-            maxTranslateY: 300,
             // 是否触摸已经结束
             touchEnd: false,
             // 触摸结束刷新条件
@@ -58,7 +54,7 @@ export default {
                 height: this.maxST + 'px',
                 paddingTop: this.maxST - this.refreshST + 'px'
             };
-        }
+        },
     },
     created() {
         this.maxST = this.unitConversion(this.maxScrollTop);
@@ -69,6 +65,7 @@ export default {
     },
     methods: {
         handleScroll(event) {
+            console.log(`distanceScroll:${-(event.target.scrollTop - this.maxST)}`);
             this.Trigger();
         },
         // 触发器
@@ -128,7 +125,6 @@ export default {
             }
             this.Trigger();
         },
-
         changeScroll(startScroll, endScroll) {
             let beforeScrollTop = startScroll;
             const scrollAnimation = () => {
@@ -150,9 +146,9 @@ export default {
             const r = parseFloat(document.querySelector('html').style.fontSize);
             console.log(r);
             if (target.indexOf('rem') > -1) {
-                return parseFloat(this.maxScrollTop) * r;
+                return parseFloat(target) * r;
             } else {
-                return parseFloat(this.maxScrollTop);
+                return parseFloat(target);
             }
         },
     },
@@ -172,6 +168,7 @@ export default {
       width: 100%;
       text-align: center;
       font-size: 0.32rem;
+      box-sizing: border-box;
     }
     .pullupContent {
       text-align: center;
