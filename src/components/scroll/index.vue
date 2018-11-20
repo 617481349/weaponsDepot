@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import animation from './Tween/animation.js';
 export default {
     props: {
         height: {
@@ -65,7 +66,7 @@ export default {
     },
     methods: {
         handleScroll(event) {
-            console.log(`distanceScroll:${-(event.target.scrollTop - this.maxST)}`);
+            // console.log(`distanceScroll:${-(event.target.scrollTop - this.maxST)}`);
             this.Trigger();
         },
         // 触发器
@@ -76,10 +77,10 @@ export default {
                     this.touchEnd = false;
                     /**
                      * 验证是否触发下拉逻辑
-                     * maxScrollTop参数是下拉的最大值，同时也是下拉提示区的高度
+                     * maxST参数是下拉的最大值，同时也是下拉提示区的高度
                      * 所以(准)顶部的scrollTop的值就是下拉提示区的高度
                      * 只要scrollTop值比下拉提示区的高度小了，那就是超出了滚动内容区域了
-                     * scrollTop比maxScrollTop少多少，就是超出的部分
+                     * scrollTop比maxST少多少，就是超出的部分
                      * 需要触发回弹动画
                      * */
                     /**
@@ -87,7 +88,7 @@ export default {
                      * 就是scrollTop<=refreshScrollTop(触发下拉刷新逻辑的高度)的情况
                      */
                     // 判断上拉回弹条件是否成立
-                    if (this.$refs.scrollParent.scrollTop < this.maxScrollTop) {
+                    if (this.$refs.scrollParent.scrollTop < this.maxST) {
                         // 判断上拉刷新条件是否满足
                         if (
                             this.$refs.scrollParent.scrollTop <=
@@ -101,7 +102,7 @@ export default {
                         } else {
                             this.changeScroll(
                                 this.$refs.scrollParent.scrollTop,
-                                this.maxScrollTop
+                                this.maxST
                             );
                         }
                         this.touchEndRefresh = false;
@@ -120,37 +121,30 @@ export default {
          */
         onEnd() {
             this.touchEnd = true;
-            if (this.$refs.scrollParent.scrollTop < this.maxScrollTop) {
+            if (this.$refs.scrollParent.scrollTop < this.maxST) {
                 this.touchEndRefresh = true;
             }
             this.Trigger();
         },
         changeScroll(startScroll, endScroll) {
-            let beforeScrollTop = startScroll;
-            const scrollAnimation = () => {
-                let nowScrollTop = this.$refs.scrollParent.scrollTop;
-                if (beforeScrollTop === nowScrollTop) {
-                    nowScrollTop += 20;
-                    if (nowScrollTop > endScroll) {
-                        nowScrollTop = endScroll;
-                    }
-                    beforeScrollTop = this.$refs.scrollParent.scrollTop = nowScrollTop;
-                    if (this.$refs.scrollParent.scrollTop < endScroll) {
-                        requestAnimationFrame(scrollAnimation);
-                    }
-                }
-            };
-            scrollAnimation();
+            console.log(endScroll - startScroll);
+            let duration = 500;
+            if (endScroll - startScroll < 120) {
+                duration = 250;
+            }
+            animation(startScroll, endScroll, duration, 'Circ.easeOut', (value) => {
+                this.$refs.scrollParent.scrollTop = value;
+            });
         },
         unitConversion(target) {
             const r = parseFloat(document.querySelector('html').style.fontSize);
-            console.log(r);
             if (target.indexOf('rem') > -1) {
                 return parseFloat(target) * r;
             } else {
                 return parseFloat(target);
             }
         },
+    
     },
 };
 </script>
