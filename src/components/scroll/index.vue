@@ -1,6 +1,6 @@
 <template>
     <div ref="scrollParent" class="scroll" :style="'height:'+height"
-         @scroll="handleScroll" @touchend="onEnd">
+         @scroll="handleScroll" @touchstart="touchStart = true" @touchend="onEnd">
         <div class="scrollChild">
             <!-- 下拉刷新提示DOM -->
             <div class="pulldownContent" :style="pullDownStyle">Refresh</div>
@@ -37,11 +37,12 @@ export default {
         return {
             maxST: 0,
             refreshST: 0,
+            refreshST_MAP: 0,
             showPullUpContent: false,
             // 距离scroll顶部距离
             distanceToScrollTop: 0,
-            // 是否触摸已经结束
             touchEnd: false,
+            touchStart: false,
             // 触摸结束刷新条件
             touchEndRefresh: false,
             // 用于记录Scroll事件回调定时器ID,函数节流所需变量
@@ -53,62 +54,43 @@ export default {
         pullDownStyle() {
             return {
                 height: this.maxST + 'px',
-                paddingTop: this.maxST - this.refreshST + 'px'
+                paddingTop: this.refreshST + 'px'
             };
         },
     },
     created() {
         this.maxST = this.unitConversion(this.maxScrollTop);
-        this.refreshST = this.unitConversion(this.refreshScrollTop);
+        this.refreshST_MAP = this.unitConversion(this.refreshScrollTop);
+        this.refreshST = this.maxST - this.refreshST_MAP;
     },
     mounted() {
         this.$refs.scrollParent.scrollTop = this.maxST;
     },
     methods: {
         handleScroll(event) {
-            // console.log(`distanceScroll:${-(event.target.scrollTop - this.maxST)}`);
+            const ST = event.target.scrollTop;
+            const ST_MAP = -(ST - this.maxST);
+            console.log(ST_MAP);
             this.Trigger();
         },
         // 触发器
         Trigger() {
-            clearTimeout(this.tId);
-            this.tId = setTimeout(() => {
-                if (this.touchEnd) {
+            if (this.touchEnd) {
+                clearTimeout(this.tId);
+                this.tId = setTimeout(() => {
                     this.touchEnd = false;
-                    /**
-                     * 验证是否触发下拉逻辑
-                     * maxST参数是下拉的最大值，同时也是下拉提示区的高度
-                     * 所以(准)顶部的scrollTop的值就是下拉提示区的高度
-                     * 只要scrollTop值比下拉提示区的高度小了，那就是超出了滚动内容区域了
-                     * scrollTop比maxST少多少，就是超出的部分
-                     * 需要触发回弹动画
-                     * */
-                    /**
-                     * 触发回弹动画有1种特殊情况
-                     * 就是scrollTop<=refreshScrollTop(触发下拉刷新逻辑的高度)的情况
-                     */
-                    // 判断上拉回弹条件是否成立
-                    if (this.$refs.scrollParent.scrollTop < this.maxST) {
-                        // 判断上拉刷新条件是否满足
-                        if (
-                            this.$refs.scrollParent.scrollTop <=
-                                this.refreshScrollTop &&
-                            this.touchEndRefresh
-                        ) {
-                            this.changeScroll(
-                                this.$refs.scrollParent.scrollTop,
-                                this.refreshScrollTop
-                            );
+                    const ST = this.$refs.scrollParent.scrollTop;
+                    const ST_MAP = -(ST - this.maxST);
+                    console.log(ST_MAP, this.refreshST_MAP, 'Trigger');
+                    if (ST_MAP > 0) {
+                        if (ST_MAP >= this.refreshST_MAP) {
+                            this.changeScroll(ST, this.refreshST);
                         } else {
-                            this.changeScroll(
-                                this.$refs.scrollParent.scrollTop,
-                                this.maxST
-                            );
+                            this.changeScroll(ST, this.maxST);
                         }
-                        this.touchEndRefresh = false;
                     }
-                }
-            }, 50);
+                }, 60);
+            }
         },
         /**
          * 函数节流：
@@ -120,21 +102,25 @@ export default {
          * 总结以上2种拖动都有个共同点，就是滚动结束时触摸都是结束状态
          */
         onEnd() {
+            const ST = this.$refs.scrollParent.scrollTop;
+            const ST_MAP = -(ST - this.maxST);
+            console.log(ST_MAP, 'onEnd');
             this.touchEnd = true;
-            if (this.$refs.scrollParent.scrollTop < this.maxST) {
-                this.touchEndRefresh = true;
-            }
+            this.touchStart = false;
             this.Trigger();
         },
         changeScroll(startScroll, endScroll) {
-            console.log(endScroll - startScroll);
             let duration = 500;
             if (endScroll - startScroll < 120) {
                 duration = 250;
             }
-            animation(startScroll, endScroll, duration, 'Circ.easeOut', (value) => {
+            const getId = animation(startScroll, endScroll, duration, 'Circ.easeOut', (value) => {
+                if (this.touchStart) {
+                    try { window.cancelAnimationFrame(getId()) } catch (error) {}
+                }
                 this.$refs.scrollParent.scrollTop = value;
             });
+
         },
         unitConversion(target) {
             const r = parseFloat(document.querySelector('html').style.fontSize);
@@ -151,25 +137,25 @@ export default {
 
 <style scoped lang="scss">
 .scroll {
-  overflow: scroll;
-  position: relative;
-  -webkit-overflow-scrolling: touch;
-  .scrollChild {
-    &.trs {
-      transition: 0.5s all;
+    overflow: scroll;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+    .scrollChild {
+        &.trs {
+            transition: 0.5s all;
+        }
+        .pulldownContent {
+            width: 100%;
+            text-align: center;
+            font-size: 0.32rem;
+            box-sizing: border-box;
+        }
+        .pullupContent {
+            text-align: center;
+            height: 50px;
+            line-height: 50px;
+            font-size: 16px;
+        }
     }
-    .pulldownContent {
-      width: 100%;
-      text-align: center;
-      font-size: 0.32rem;
-      box-sizing: border-box;
-    }
-    .pullupContent {
-      text-align: center;
-      height: 50px;
-      line-height: 50px;
-      font-size: 16px;
-    }
-  }
 }
 </style>

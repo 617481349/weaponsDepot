@@ -20,9 +20,6 @@ export default {
             message: '',
             visible: false
         };
-    },
-    created() {
-        console.log(this);
     }
 };
 </script>

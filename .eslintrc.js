@@ -143,7 +143,7 @@ module.exports = {
         //
         // @fixable 限制自定义组件的属性风格
         // 默认为 hyphenated name 如 my-prop
-        'vue/attribute-hyphenation': 'error',
+        'vue/attribute-hyphenation': 'off',
         // @fixable 限制关闭标签是否要另起一行
         // @off 太严格
         'vue/html-closing-bracket-newline': 'off',

@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <lee-scroll height="80vh">
+        <lee-scroll height="80vh" maxScrollTop="3rem" refreshScrollTop="1rem">
             <p class="item" v-for="(item,index) in new Array(100)" :key="index">{{ index }}</p>
         </lee-scroll>
     </div>
