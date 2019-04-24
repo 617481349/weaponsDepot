@@ -2,13 +2,10 @@
     <div ref="scrollParent" class="scroll" :style="'height:'+height"
          @scroll="handleScroll" @touchstart="touchStart = true" @touchend="onEnd">
         <div class="scrollChild">
-            <!-- 下拉刷新提示DOM -->
             <div class="pulldownContent" :style="pullDownStyle">Refresh</div>
-            <!-- 滚动组件内容插槽 -->
             <div ref="scrollContent">
                 <slot></slot>
             </div>
-            <!-- 上拉加载提示DOM -->
             <div v-if="showPullUpContent" class="pullupContent">上拉加载</div>
         </div>
     </div>
@@ -73,7 +70,6 @@ export default {
             console.log(ST_MAP);
             this.Trigger();
         },
-        // 触发器
         Trigger() {
             if (this.touchEnd) {
                 clearTimeout(this.tId);
